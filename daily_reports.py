@@ -11,6 +11,7 @@ from loggers import logger
 class DailyReportsService:
 
     # ---- Class Variables ----
+    symbol_list = []
     host = "https://nsearchives.nseindia.com/"
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0: Win64; x64',
@@ -73,8 +74,11 @@ class DailyReportsService:
                 logger.warning(f"{self.filename} is not present at: {file_path} !")
                 return None
 
+            df = pd.read_csv(file_path, skiprows=[1])
+            for index, row in df.iterrows():
+                self.symbol_list.append(f"NSE:{row['Symbol']}-EQ")
 
-
+            return self.symbol_list
         except Exception as e:
             logger.info(f"exception occurred while fetching stocks symbols from csv: {e} !")
             return None
@@ -84,4 +88,6 @@ class DailyReportsService:
 
 if __name__ == '__main__':
     dr = DailyReportsService()
-    dr.fetch_nifty_50_stocks_list()
+    # dr.fetch_nifty_50_stocks_list()
+    stocks_list = dr.fetch_stocks_symbols()
+    print(stocks_list)
